@@ -1,0 +1,6 @@
+/* NumberWithUnit: the unit dropdown takes only the width of its content while the number input
+   absorbs the rest, instead of the FusedGroup's default equal-columns split. `.fi-sc` is the inner
+   grid rendered by the FusedGroup; the wrapper class is set by NumberWithUnit::CSS_CLASS. */
+.filament-extra-number-with-unit > .fi-sc {
+    grid-template-columns: minmax(0, 1fr) max-content !important;
+}
