@@ -1,20 +1,20 @@
-/* NumberWithUnit: the unit dropdown takes only the width of its content while the number input
-   absorbs the rest, instead of the FusedGroup's default equal-columns split. `.fi-sc` is the inner
-   grid rendered by the FusedGroup; the wrapper class is set by NumberWithUnit::CSS_CLASS. */
-.filament-extra-number-with-unit > .fi-sc {
+/* InputWithSelect: the select takes only the width of its content while the input absorbs the rest,
+   instead of the FusedGroup's default equal-columns split. `.fi-sc` is the inner grid rendered by the
+   FusedGroup; the wrapper class is set by InputWithSelect::CSS_CLASS. */
+.fi-input-with-select > .fi-sc {
     grid-template-columns: minmax(0, 1fr) max-content !important;
 }
 
-/* Keep the two halves flush: square the inner corners (the number's trailing edge and the unit's
+/* Keep the two halves flush: square the inner corners (the input's trailing edge and the select's
    leading edge) so they sit against each other as one control — even under themes that round every
    input wrapper, and regardless of the responsive grid class the corner rules would otherwise need.
    Logical properties, so this follows the writing direction (LTR/RTL). */
-.filament-extra-number-with-unit > .fi-sc > :first-child .fi-input-wrp {
+.fi-input-with-select > .fi-sc > :first-child .fi-input-wrp {
     border-start-end-radius: 0 !important;
     border-end-end-radius: 0 !important;
 }
 
-.filament-extra-number-with-unit > .fi-sc > :last-child .fi-input-wrp {
+.fi-input-with-select > .fi-sc > :last-child .fi-input-wrp {
     border-start-start-radius: 0 !important;
     border-end-start-radius: 0 !important;
 }
