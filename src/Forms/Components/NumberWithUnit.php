@@ -2,35 +2,35 @@
 
 namespace HackeMate\FilamentExtraFields\Forms\Components;
 
-use Closure;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\FusedGroup;
 
 /**
- * A reusable "number + unit" field: an integer input fused with a unit dropdown into a single
- * control (the select sits *inside* the field, as a suffix), built on Filament v4's native
- * {@see FusedGroup} — the same primitive behind "amount + currency" inputs.
+ * Fuses a numeric input and a unit dropdown into a single control — the select sits *inside* the
+ * field, as a suffix (the same shape as an "amount + currency" input) — on top of Filament v4's
+ * native {@see FusedGroup}.
  *
- * Both halves are real Filament fields, so state, validation, hydration and reactivity
- * (`live()` / `afterStateUpdated`) are all native. There are no mirrored internal Blade views and no
- * ad-hoc containers, which is exactly what made the abandoned v3-era plugins break on upgrades.
+ * Both halves are plain Filament components that **you** build and configure with the full native
+ * API (`->numeric()`, `->minValue()`, `->options()`, `->default()`, `->live()`,
+ * `->afterStateUpdated()`, `->dehydrated()`, …). This class assumes nothing about your use case: it
+ * only hides the child labels (the group carries the label), lays the two halves out side by side,
+ * and applies the stylesheet that sizes the unit to its content. Everything else is yours.
  *
- * The unit dropdown is sized to its content (not a 50/50 grid split) by the bundled stylesheet, which
- * the package's service provider registers automatically.
+ * Returns the underlying `FusedGroup`, so you keep chaining any layout method on it — `->label()`,
+ * `->helperText()`, `->columnSpan()`, `->visible()`, …
  *
  * Example:
  *
- *     use Filament\Schemas\Components\Utilities\Get;
- *     use Filament\Schemas\Components\Utilities\Set;
+ *     use Filament\Forms\Components\Select;
+ *     use Filament\Forms\Components\TextInput;
  *     use HackeMate\FilamentExtraFields\Forms\Components\NumberWithUnit;
  *
  *     NumberWithUnit::make(
- *         numberName: 'duration_value',
- *         unitName: 'duration_unit',
- *         units: ['minutes' => 'minutes', 'hours' => 'hours', 'days' => 'days'],
- *         defaultUnit: 'hours',
- *         onChange: fn (Get $get, Set $set) => /* recompute end time, etc. */ null,
+ *         number: TextInput::make('duration_value')->numeric()->minValue(1),
+ *         unit: Select::make('duration_unit')
+ *             ->options(['minutes' => 'Minutes', 'hours' => 'Hours', 'days' => 'Days'])
+ *             ->default('hours'),
  *     )->label('Duration');
  */
 final class NumberWithUnit
@@ -41,49 +41,15 @@ final class NumberWithUnit
     public const CSS_CLASS = 'filament-extra-number-with-unit';
 
     /**
-     * @param  string  $numberName  name / state path of the numeric input
-     * @param  string  $unitName  name / state path of the unit select
-     * @param  array<string, string>  $units  select options (value => label)
-     * @param  string|null  $defaultUnit  initial unit value (e.g. 'hours')
-     * @param  Closure|null  $onChange  afterStateUpdated callback (receives Get/Set) fired when either half changes
-     * @param  bool  $ephemeral  when true (default), neither half is dehydrated — they are inputs, not columns
+     * @param  TextInput  $number  the numeric input, configured by the caller
+     * @param  Select  $unit  the unit dropdown, configured by the caller
      */
-    public static function make(
-        string $numberName,
-        string $unitName,
-        array $units,
-        ?string $defaultUnit = null,
-        ?Closure $onChange = null,
-        bool $ephemeral = true,
-    ): FusedGroup {
-        $number = TextInput::make($numberName)
-            ->hiddenLabel()
-            ->numeric()
-            ->minValue(1)
-            ->columnSpan(1);
-
-        $unit = Select::make($unitName)
-            ->hiddenLabel()
-            ->options($units)
-            ->selectablePlaceholder(false)
-            ->native(false)
-            ->columnSpan(1);
-
-        if ($defaultUnit !== null) {
-            $unit->default($defaultUnit);
-        }
-
-        if ($ephemeral) {
-            $number->dehydrated(false);
-            $unit->dehydrated(false);
-        }
-
-        if ($onChange !== null) {
-            $number->live(debounce: '500ms')->afterStateUpdated($onChange);
-            $unit->live()->afterStateUpdated($onChange);
-        }
-
-        return FusedGroup::make([$number, $unit])
+    public static function make(TextInput $number, Select $unit): FusedGroup
+    {
+        return FusedGroup::make([
+            $number->hiddenLabel()->columnSpan(1),
+            $unit->hiddenLabel()->columnSpan(1),
+        ])
             ->columns(2)
             ->extraAttributes(['class' => self::CSS_CLASS]);
     }

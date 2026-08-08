@@ -31,38 +31,35 @@ as a suffix (the same shape as an "amount + currency" input). It is built on Fil
 [`FusedGroup`](https://filamentphp.com/docs/4.x/schemas/layouts#fusing), so both halves are real
 Filament fields: state, validation, hydration and reactivity are all native.
 
+You build and configure **both halves yourself** with the full native API. `NumberWithUnit` assumes
+nothing about your use case — it only hides the child labels (the group carries the label), lays the
+two halves side by side, and applies the stylesheet that sizes the unit to its content:
+
 ```php
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use HackeMate\FilamentExtraFields\Forms\Components\NumberWithUnit;
 
 NumberWithUnit::make(
-    numberName: 'duration_value',
-    unitName: 'duration_unit',
-    units: [
-        'minutes' => 'minutes',
-        'hours' => 'hours',
-        'days' => 'days',
-    ],
-    defaultUnit: 'hours',
-    onChange: function (Get $get, Set $set): void {
-        // Fired whenever the number OR the unit changes — e.g. recompute an end time.
-    },
+    number: TextInput::make('duration_value')
+        ->numeric()
+        ->minValue(1),
+    unit: Select::make('duration_unit')
+        ->options(['minutes' => 'Minutes', 'hours' => 'Hours', 'days' => 'Days'])
+        ->default('hours'),
 )
     ->label('Duration')
-    ->helperText('How long the event lasts.');
+    ->helperText('How long it lasts.');
 ```
 
 | Argument | Type | Description |
 |---|---|---|
-| `numberName` | `string` | Name / state path of the numeric input. |
-| `unitName` | `string` | Name / state path of the unit select. |
-| `units` | `array<string, string>` | Select options as `value => label`. |
-| `defaultUnit` | `?string` | Initial unit value (e.g. `'hours'`). |
-| `onChange` | `?Closure` | `afterStateUpdated` callback (receives `Get`/`Set`) fired when either half changes. |
-| `ephemeral` | `bool` | When `true` (default), neither half is dehydrated — they are inputs, not model columns. |
+| `number` | `TextInput` | The numeric input, configured by you (`->numeric()`, `->minValue()`, `->live()`, …). |
+| `unit` | `Select` | The unit dropdown, configured by you (`->options()`, `->default()`, `->live()`, …). |
 
-`make()` returns a `FusedGroup`, so you can keep chaining any layout method on it (`->label()`,
+Because both halves are ordinary Filament components, anything native works — make them reactive with
+`->live()->afterStateUpdated(...)`, keep them out of the model with `->dehydrated(false)`, validate
+them, and so on. `make()` returns the `FusedGroup`, so keep chaining layout methods on it (`->label()`,
 `->helperText()`, `->columnSpan()`, `->visible()`, …).
 
 The unit dropdown is sized to its content (not an equal-columns split) via the bundled stylesheet.
