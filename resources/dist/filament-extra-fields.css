@@ -4,3 +4,17 @@
 .filament-extra-number-with-unit > .fi-sc {
     grid-template-columns: minmax(0, 1fr) max-content !important;
 }
+
+/* Keep the two halves flush: square the inner corners (the number's trailing edge and the unit's
+   leading edge) so they sit against each other as one control — even under themes that round every
+   input wrapper, and regardless of the responsive grid class the corner rules would otherwise need.
+   Logical properties, so this follows the writing direction (LTR/RTL). */
+.filament-extra-number-with-unit > .fi-sc > :first-child .fi-input-wrp {
+    border-start-end-radius: 0 !important;
+    border-end-end-radius: 0 !important;
+}
+
+.filament-extra-number-with-unit > .fi-sc > :last-child .fi-input-wrp {
+    border-start-start-radius: 0 !important;
+    border-end-start-radius: 0 !important;
+}
