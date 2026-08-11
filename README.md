@@ -69,6 +69,36 @@ trigger to the *selected* value, so the control's width shifts as the selection 
 
 The select is sized to its content (not an equal-columns split) via the bundled stylesheet.
 
+### `StarRating`
+
+A clickable star-rating input. The state is an integer from `1` to `max` (default `5`), or `null` when
+unset. Hovering previews a rating, clicking a star commits it, and clicking the selected star clears it
+back to `null` — so "no rating" is always reachable.
+
+```php
+use HackeMate\FilamentExtraFields\Forms\Components\StarRating;
+
+StarRating::make('rating')
+    ->label('Rating')
+    ->helperText('How would you rate it?');
+
+StarRating::make('score')
+    ->max(10)              // 1..10 instead of 1..5
+    ->clearable(false);    // clicking the selected star no longer unsets it
+```
+
+| Method | Default | Description |
+|---|---|---|
+| `->max(int)` | `5` | Number of stars (the maximum selectable rating). |
+| `->clearable(bool)` | `true` | Whether clicking the selected star clears the value back to `null`. |
+
+Bind it to any nullable integer column. Unlike the other fields it is not a composition of existing
+components — Filament ships no star primitive — so it extends the public `Field` base with a tiny
+self-contained Blade + Alpine view. It still stays on the public field API (the standard field wrapper
+and native `$entangle` state binding), copies no internal Filament view and keeps no ad-hoc state
+container, so it upgrades with the framework like the rest. Keep chaining the native API (`->label()`,
+`->helperText()`, `->required()`, `->disabled()`, `->default()`, `->columnSpan()`, …).
+
 ## Roadmap
 
 This package starts small and grows as fields prove themselves in real projects. Contributions and

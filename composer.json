@@ -1,6 +1,6 @@
 {
     "name": "hackemate28-ux/filament-extra-fields",
-    "description": "Extra form fields for Filament v4, built on native primitives — starting with a fused number-with-unit input.",
+    "description": "Extra form fields for Filament v4, built on native primitives — a fused input-with-select and a star-rating field.",
     "keywords": [
         "filament",
         "filamentphp",
